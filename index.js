@@ -87,7 +87,7 @@ const run = async () => {
     try {
         app.get('/', async (req, res) => {
 
-            res.send('server is running perfectly', await users.find({}).toArray());
+            res.send (await users.find({}).toArray());
         })
 
         //User post here
