@@ -133,17 +133,20 @@ const run = async () => {
 
         app.get("/allTextedPerson", verifyJWT, async (req, res) => {
             const email = req.query.user;
+            // console.log(email, req.decoded.email)
             if (email !== req.decoded.email) {
                 return res.status(403).send({ message: "Forbidden Access" });
             }
             const user = req.query.user;
             let allUserList = await users.find({ email: { $ne: user } }).toArray();
             let allMessagesOfUser = await allMessages.find({ $or: [{ sender: user }, { receiver: user }] }).sort({ currentTimeMili: -1 }).toArray();
+            // console.log(allMessagesOfUser);
             allUserList.forEach(element => {
                 const findLastMessage = allMessagesOfUser.find(data => (data.sender === user && data.receiver === element.email) || (data.sender === element.email && data.receiver === user));
                 element.data = findLastMessage?.data;
                 element.currentTimeMili = findLastMessage?.currentTimeMili
             })
+            // console.log(typeof JSON.stringify({allUserList}));
             res.send(allUserList);
         });
 
@@ -155,6 +158,7 @@ const run = async () => {
             const query = { $or: [{ $and: [{ sender: req.query.user }, { receiver: req.query.to }] }, { $and: [{ sender: req.query.to }, { receiver: req.query.user }] }] }
             const availabilityCheck = await allRooms.findOne(query);
             let result = await allMessages.find(query).sort({ currentTimeMili: 1 }).toArray();
+            // console.log( "result",typeof(result));
             if (!availabilityCheck) {
                 await allRooms.insertOne({ sender: req.body.selectedPerson.sender, receiver: req.body.selectedPerson.receiver, roomAddress: req.body.selectedPerson.roomAddress });
                 return res.send([result, { roomAddress: req.body.selectedPerson.roomAddress }])
