@@ -86,8 +86,17 @@ const run = async () => {
     const allRooms = client.db('ChattingApp').collection('allRooms');
     try {
         app.get('/', async (req, res) => {
+            const user = "ranga@gmail.com";
+            let allUserList = await users.find({ email: { $ne: user } }).toArray();
+            let allMessagesOfUser = await allMessages.find({ $or: [{ sender: user }, { receiver: user }] }).sort({ currentTimeMili: -1 }).toArray();
+            // console.log(allMessagesOfUser);
+            allUserList.forEach(element => {
+                const findLastMessage = allMessagesOfUser.find(data => (data.sender === user && data.receiver === element.email) || (data.sender === element.email && data.receiver === user));
+                element.data = findLastMessage?.data;
+                element.currentTimeMili = findLastMessage?.currentTimeMili
+            })
 
-            res.send (await users.find({}).toArray());
+            res.send(await users.find({}).toArray());
         })
 
         //User post here
@@ -132,7 +141,7 @@ const run = async () => {
             res.send(result)
         })
 
-        app.get("/allTextedPerson",  async (req, res) => {
+        app.get("/allTextedPerson", async (req, res) => {
             const email = 'ranga@gmail.com';
             // console.log(email, req.decoded.email)
             if (email !== req.decoded.email) {
