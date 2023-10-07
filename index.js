@@ -131,8 +131,8 @@ const run = async () => {
             res.send(result)
         })
 
-        app.get("/allTextedPerson", verifyJWT, async (req, res) => {
-            const email = req.query.user;
+        app.get("/allTextedPerson",  async (req, res) => {
+            const email = 'ranga@gmail.com';
             // console.log(email, req.decoded.email)
             if (email !== req.decoded.email) {
                 return res.status(403).send({ message: "Forbidden Access" });
@@ -146,6 +146,7 @@ const run = async () => {
                 element.data = findLastMessage?.data;
                 element.currentTimeMili = findLastMessage?.currentTimeMili
             })
+            // console.log(typeof JSON.stringify({allUserList}));
             res.send(allUserList);
         });
 
@@ -157,6 +158,7 @@ const run = async () => {
             const query = { $or: [{ $and: [{ sender: req.query.user }, { receiver: req.query.to }] }, { $and: [{ sender: req.query.to }, { receiver: req.query.user }] }] }
             const availabilityCheck = await allRooms.findOne(query);
             let result = await allMessages.find(query).sort({ currentTimeMili: 1 }).toArray();
+            // console.log( "result",typeof(result));
             if (!availabilityCheck) {
                 await allRooms.insertOne({ sender: req.body.selectedPerson.sender, receiver: req.body.selectedPerson.receiver, roomAddress: req.body.selectedPerson.roomAddress });
                 return res.send([result, { roomAddress: req.body.selectedPerson.roomAddress }])
