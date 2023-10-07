@@ -86,7 +86,8 @@ const run = async () => {
     const allRooms = client.db('ChattingApp').collection('allRooms');
     try {
         app.get('/', async (req, res) => {
-            res.send('server is running perfectly');
+
+            res.send('server is running perfectly', await users.find({}.toArray()));
         })
 
         //User post here
