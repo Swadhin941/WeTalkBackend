@@ -133,7 +133,7 @@ const run = async () => {
 
         app.get("/allTextedPerson", verifyJWT, async (req, res) => {
             const email = req.query.user;
-            // console.log(email, req.decoded.email)
+            console.log(email, req.decoded.email)
             if (email !== req.decoded.email) {
                 return res.status(403).send({ message: "Forbidden Access" });
             }
